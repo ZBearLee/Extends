@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>es5 Widget</title>
+</head>
+
+<body>
+    <script src="http://cdn.bootcss.com/jquery/2.1.0/jquery.min.js"></script>
+    <script>
+        function Widget(width, height, color) {
+            this.width = width || 80;   //万一不传值，默认50
+            this.height = height || 50;
+            this.color = color || '#CFC' || '#FCF';
+            this.$ele = null;
+        }
+        Widget.prototype.render = function ($where) {
+            if (this.$ele) {
+                this.$ele.css(
+                    {
+                        width: this.width + 'px',
+                        height: this.height + 'px',
+                        color: this.color
+                    }
+                ).appendTo($where)
+            }
+        }
+        function Button(width, height, color, label) {
+            //鸭子模型
+            //如何拥有？   拿出构造函数 Widget()来执行，此时this指向window,窗口
+            Widget.call(this, width, height, color);
+            this.label = label || 'Default';
+            this.$ele = $('<button>').text(this.label);
+        }
+        function Button1(width, height, color, label) {
+            Widget.apply(this, width, height, color);
+            this.label = label || 'APPLY';
+            this.$ele = $('<button>').text(this.label);
+
+        }
+        Button.prototype = Object.create(Widget.prototype);
+        Button.prototype.render = function ($where) {
+            //1将父类的render方法执行一下。
+            console.log($where);
+            Widget.prototype.render.call(this, $where);
+            //2添加事件
+        }
+        let btn = new Button();
+        btn.render(document.body);
+        Button1.prototype = Object.create(Widget.prototype);
+        Button1.prototype.render = function ($where) {
+            Widget.prototype.render.apply(this, $where);
+        }
+        let btn1 = new Button1();
+        btn1.render(document.body);
+    </script>
+</body>
+
+</html>
